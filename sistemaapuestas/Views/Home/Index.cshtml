@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="text-center">
+    <h1 class="display-4 fw-bold text-primary mb-3">
+        <i class="bi bi-trophy"></i> Sistema de Apuestas Deportivas
+    </h1>
+    <h2 class="text-secondary mb-4">Copa Mundial de Fútbol 2026</h2>
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-event display-6 text-primary"></i>
+                    <h5 class="card-title mt-2">Partidos</h5>
+                    <p class="card-text">Consulta el calendario del Mundial</p>
+                    <a asp-controller="Partidos" asp-action="Index" class="btn btn-primary">
+                        Ver Partidos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @if (Context.Session.GetInt32("UserId") != null)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-cash-stack display-6 text-success"></i>
+                        <h5 class="card-title mt-2">Billetera</h5>
+                        <p class="card-text">Administra tu saldo y movimientos</p>
+                        <a asp-controller="Billetera" asp-action="Index" class="btn btn-success">
+                            Ir a Billetera
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-list-check display-6 text-warning"></i>
+                        <h5 class="card-title mt-2">Mis Apuestas</h5>
+                        <p class="card-text">Revisa tu historial de apuestas</p>
+                        <a asp-controller="Apuestas" asp-action="Historial" class="btn btn-warning">
+                            Ver Historial
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-person-plus display-6 text-info"></i>
+                        <h5 class="card-title mt-2">Regístrate</h5>
+                        <p class="card-text">Crea tu cuenta para empezar a apostar</p>
+                        <a asp-controller="Auth" asp-action="Registro" class="btn btn-info text-white">
+                            Registrarse
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-box-arrow-in-right display-6 text-secondary"></i>
+                        <h5 class="card-title mt-2">Inicia Sesión</h5>
+                        <p class="card-text">Accede a tu cuenta</p>
+                        <a asp-controller="Auth" asp-action="Login" class="btn btn-secondary">
+                            Iniciar Sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="es" id="htmlRoot">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - Apuestas Mundial 2026</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/sistemaapuestas.styles.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <script>
+        (function () {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.getElementById('htmlRoot').setAttribute('data-bs-theme', 'dark');
+            }
+        })();
+    </script>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                <img src="/Logo_Oscuro.png" alt="Apuestas" class="logo-light me-2" style="height:32px" />
+                <img src="/Logo_Blanco.png" alt="Apuestas" class="logo-dark me-2" style="height:32px" />
+                <span>Apuestas Mundial 2026</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Partidos" asp-action="Index">
+                            <i class="bi bi-calendar-event"></i> Partidos
+                        </a>
+                    </li>
+                    @if (Context.Session.GetInt32("UserId") != null)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Apuestas" asp-action="Historial">
+                                <i class="bi bi-list-check"></i> Mis Apuestas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Billetera" asp-action="Index">
+                                <i class="bi bi-wallet2"></i> Billetera
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Notificaciones" asp-action="Index">
+                                <i class="bi bi-bell"></i> Notificaciones
+                            </a>
+                        </li>
+                    }
+                    @if (Context.Session.GetString("UserRole") == "admin")
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear"></i> Admin
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index"><i class="bi bi-speedometer2"></i> Panel</a></li>
+                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="CreatePartido"><i class="bi bi-plus-circle"></i> Crear Partido</a></li>
+                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="Usuarios"><i class="bi bi-people"></i> Usuarios</a></li>
+                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="CreateAdmin"><i class="bi bi-shield-lock"></i> Crear Admin</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-controller="Admin" asp-action="SeedFromApi" method="post" class="px-3 py-1">
+                                        <button type="submit" class="btn btn-sm btn-info w-100">
+                                            <i class="bi bi-cloud-download"></i> Importar Partidos
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                </ul>
+                <ul class="navbar-nav align-items-center">
+                    @if (Context.Session.GetInt32("UserId") != null)
+                    {
+                        <li class="nav-item">
+                            <span class="nav-link text-light">
+                                <i class="bi bi-person-circle"></i> @Context.Session.GetString("UserName")
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light btn-sm" asp-controller="Auth" asp-action="Logout">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Auth" asp-action="Login">
+                                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Auth" asp-action="Registro">
+                                <i class="bi bi-person-plus"></i> Registrarse
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" asp-controller="AdminAuth" asp-action="LoginAdmin">
+                                <i class="bi bi-shield-lock"></i> Admin
+                            </a>
+                        </li>
+                    }
+                    <li class="nav-item ms-2">
+                        <button id="darkModeToggle" class="btn btn-sm" title="Alternar modo oscuro">
+                            <i id="darkModeIcon" class="bi bi-moon-fill fs-5"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main role="main" class="pb-3">
+    <div class="container mt-3">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @RenderBody()
+    </div>
+</main>
+
+<footer class="border-top footer text-muted">
+    <div class="container text-center py-3">
+        &copy; 2026 - Sistema de Apuestas Deportivas - Copa Mundial de Fútbol 2026
+    </div>
+</footer>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
