@@ -27,19 +27,19 @@
                                 <h5 class="mb-0"><img src="@TeamFlagHelper.GetFlagUrl(partido.EquipoLocal)" class="me-1" style="vertical-align:middle"> @partido.EquipoLocal</h5>
                                 @if (partido.Estado == "finalizado")
                                 {
-                                    <span class="badge bg-dark fs-5 mt-1">@partido.GolesLocal - @partido.GolesVisitante</span>
+                                    <span class="badge bg-dark fs-5 mt-1">@partido.GolesLocal</span>
                                 }
                             </div>
 
-                            <div class="text-center mx-3">
-                                <span class="badge bg-info text-dark">VS</span>
+                            <div class="text-center px-3 align-self-center">
+                                <span class="badge bg-info text-dark fs-6">VS</span>
                             </div>
 
                             <div class="text-center flex-grow-1">
                                 <h5 class="mb-0"><img src="@TeamFlagHelper.GetFlagUrl(partido.EquipoVisitante)" class="me-1" style="vertical-align:middle"> @partido.EquipoVisitante</h5>
                                 @if (partido.Estado == "finalizado")
                                 {
-                                    <span class="badge bg-dark fs-5 mt-1">@partido.GolesLocal - @partido.GolesVisitante</span>
+                                    <span class="badge bg-dark fs-5 mt-1">@partido.GolesVisitante</span>
                                 }
                             </div>
                         </div>
@@ -63,4 +63,18 @@
             </div>
         }
     </div>
+}
+
+@section Scripts {
+    <script>
+        setInterval(() => location.reload(), 10000);
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/matchHub")
+            .withAutomaticReconnect([0, 2000, 5000, 10000, 10000])
+            .build();
+
+        connection.on("MatchesUpdated", () => location.reload());
+        connection.start().catch(() => {});
+    </script>
 }

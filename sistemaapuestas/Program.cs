@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using sistemaapuestas.Data;
+using sistemaapuestas.Hubs;
 using sistemaapuestas.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,7 @@ builder.Services.AddScoped<IBilleteraService, BilleteraService>();
 builder.Services.AddScoped<INotificacionService, NotificacionService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IWorldCupApiService, WorldCupApiService>();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -41,6 +43,8 @@ app.UseRouting();
 
 app.UseSession();
 app.UseAuthorization();
+
+app.MapHub<MatchHub>("/matchHub");
 
 app.MapControllerRoute(
     name: "default",

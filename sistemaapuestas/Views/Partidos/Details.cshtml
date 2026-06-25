@@ -76,3 +76,17 @@ else if (Context.Session.GetInt32("UserId") == null)
         <a asp-controller="Auth" asp-action="Registro">regístrate</a> para apostar.
     </div>
 }
+
+@section Scripts {
+    <script>
+        setInterval(() => location.reload(), 10000);
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/matchHub")
+            .withAutomaticReconnect([0, 2000, 5000, 10000, 10000])
+            .build();
+
+        connection.on("MatchesUpdated", () => location.reload());
+        connection.start().catch(() => {});
+    </script>
+}

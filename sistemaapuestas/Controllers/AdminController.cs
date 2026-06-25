@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using sistemaapuestas.Data;
 using sistemaapuestas.Filters;
+using sistemaapuestas.Hubs;
 using sistemaapuestas.Models;
 using sistemaapuestas.Services;
 using sistemaapuestas.ViewModels.Admin;
@@ -15,12 +17,14 @@ public class AdminController : Controller
     private readonly IAdminService _adminService;
     private readonly IPartidoService _partidoService;
     private readonly AppDbContext _db;
+    private readonly IHubContext<MatchHub> _hubContext;
 
-    public AdminController(IAdminService adminService, IPartidoService partidoService, AppDbContext db)
+    public AdminController(IAdminService adminService, IPartidoService partidoService, AppDbContext db, IHubContext<MatchHub> hubContext)
     {
         _adminService = adminService;
         _partidoService = partidoService;
         _db = db;
+        _hubContext = hubContext;
     }
 
     public async Task<IActionResult> Index()
@@ -61,6 +65,7 @@ public class AdminController : Controller
         };
 
         await _adminService.CrearPartido(partido);
+        await _hubContext.Clients.All.SendAsync("MatchesUpdated");
         TempData["Success"] = "Partido creado exitosamente";
         return RedirectToAction("Index");
     }
@@ -104,6 +109,7 @@ public class AdminController : Controller
         };
 
         await _adminService.EditarPartido(partido);
+        await _hubContext.Clients.All.SendAsync("MatchesUpdated");
         TempData["Success"] = "Partido actualizado exitosamente";
         return RedirectToAction("Index");
     }
@@ -135,6 +141,7 @@ public class AdminController : Controller
         }
 
         await _adminService.RegistrarResultado(model.Id!.Value, model.GolesLocal.Value, model.GolesVisitante.Value);
+        await _hubContext.Clients.All.SendAsync("MatchesUpdated");
         TempData["Success"] = "Resultado registrado. Apuestas liquidadas automáticamente.";
         return RedirectToAction("Index");
     }
@@ -143,6 +150,7 @@ public class AdminController : Controller
     public async Task<IActionResult> ToggleApuestas(int id, bool habilitadas)
     {
         await _adminService.ToggleApuestas(id, habilitadas);
+        await _hubContext.Clients.All.SendAsync("MatchesUpdated");
         return RedirectToAction("Index");
     }
 
@@ -153,6 +161,7 @@ public class AdminController : Controller
         {
             var service = HttpContext.RequestServices.GetRequiredService<IWorldCupApiService>();
             var count = await service.SeedAllMatches();
+            await _hubContext.Clients.All.SendAsync("MatchesUpdated");
             TempData["Success"] = $"Se importaron {count} partidos desde la API del Mundial 2026";
         }
         catch (Exception ex)

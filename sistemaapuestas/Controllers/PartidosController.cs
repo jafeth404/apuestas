@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using sistemaapuestas.Filters;
+using Microsoft.AspNetCore.SignalR;
+using sistemaapuestas.Hubs;
 using sistemaapuestas.Services;
 
 namespace sistemaapuestas.Controllers;
@@ -7,14 +8,21 @@ namespace sistemaapuestas.Controllers;
 public class PartidosController : Controller
 {
     private readonly IPartidoService _partidoService;
+    private readonly IWorldCupApiService _apiService;
+    private readonly IHubContext<MatchHub> _hubContext;
 
-    public PartidosController(IPartidoService partidoService)
+    public PartidosController(IPartidoService partidoService, IWorldCupApiService apiService, IHubContext<MatchHub> hubContext)
     {
         _partidoService = partidoService;
+        _apiService = apiService;
+        _hubContext = hubContext;
     }
 
     public async Task<IActionResult> Index()
     {
+        await _apiService.RefreshMatches();
+        await _hubContext.Clients.All.SendAsync("MatchesUpdated");
+
         var fases = await _partidoService.GetFases();
         var partidos = await _partidoService.GetAll();
 
