@@ -1,0 +1,102 @@
+@model List<Partido>
+@using sistemaapuestas.Helpers
+
+@{
+    ViewData["Title"] = "Panel de Administración";
+}
+
+<h2><i class="bi bi-gear"></i> Panel de Administración</h2>
+<hr />
+
+<div class="mb-3">
+    <a asp-action="CreatePartido" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Crear Partido
+    </a>
+    <a asp-action="Usuarios" class="btn btn-secondary">
+        <i class="bi bi-people"></i> Usuarios
+    </a>
+    <a asp-action="CreateAdmin" class="btn btn-success">
+        <i class="bi bi-shield-lock"></i> Nuevo Admin
+    </a>
+    <form asp-action="SeedFromApi" method="post" class="d-inline"
+          onsubmit="return confirm('¿Importar los 104 partidos del Mundial 2026 desde worldcup26.ir?');">
+        <button type="submit" class="btn btn-info text-white">
+            <i class="bi bi-cloud-download"></i> Importar Partidos
+        </button>
+    </form>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay partidos registrados.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Local</th>
+                    <th>Visitante</th>
+                    <th>Fecha</th>
+                    <th>Fase</th>
+                    <th>Resultado</th>
+                    <th>Estado</th>
+                    <th>Apuestas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var partido in Model)
+                {
+                    <tr>
+                        <td><img src="@TeamFlagHelper.GetFlagUrl(partido.EquipoLocal)" class="me-1" style="vertical-align:middle"> @partido.EquipoLocal</td>
+                        <td><img src="@TeamFlagHelper.GetFlagUrl(partido.EquipoVisitante)" class="me-1" style="vertical-align:middle"> @partido.EquipoVisitante</td>
+                        <td>@partido.FechaHora.ToLocalTime().ToString("dd/MM/yy HH:mm")</td>
+                        <td>@partido.Fase</td>
+                        <td>
+                            @if (partido.Estado == "finalizado")
+                            {
+                                <span class="fw-bold">@partido.GolesLocal - @partido.GolesVisitante</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge @(partido.Estado switch { "programado" => "bg-primary", "en_vivo" => "bg-success", _ => "bg-secondary" })">
+                                @partido.Estado
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge @(partido.ApuestasHabilitadas ? "bg-success" : "bg-danger")">
+                                @(partido.ApuestasHabilitadas ? "Habilitadas" : "Deshabilitadas")
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a asp-action="EditPartido" asp-route-id="@partido.Id" class="btn btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                @if (partido.Estado != "finalizado")
+                                {
+                                    <a asp-action="RegistrarResultado" asp-route-id="@partido.Id" class="btn btn-outline-success">
+                                        <i class="bi bi-flag"></i>
+                                    </a>
+                                }
+                                <form asp-action="ToggleApuestas" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@partido.Id" />
+                                    <input type="hidden" name="habilitadas" value="@(!partido.ApuestasHabilitadas)" />
+                                    <button type="submit" class="btn btn-outline-warning">
+                                        <i class="bi bi-toggle-@(partido.ApuestasHabilitadas ? "on" : "off")"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,54 @@
+@model List<Usuario>
+
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<h2><i class="bi bi-people"></i> Gestión de Usuarios</h2>
+<hr />
+
+<div class="mb-3">
+    <a asp-action="CreateAdmin" class="btn btn-success">
+        <i class="bi bi-person-plus"></i> Crear Nuevo Admin
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Registro</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.Id</td>
+                    <td>@u.Nombre</td>
+                    <td>@u.Correo</td>
+                    <td>@u.FechaRegistro.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <span class="badge @(u.Estado == "activo" ? "bg-success" : "bg-danger")">
+                            @u.Estado
+                        </span>
+                    </td>
+                    <td>
+                        <form asp-action="SuspenderUsuario" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@u.Id" />
+                            <button type="submit" class="btn btn-sm @(u.Estado == "activo" ? "btn-warning" : "btn-success")">
+                                <i class="bi bi-@(u.Estado == "activo" ? "pause" : "play")"></i>
+                                @(u.Estado == "activo" ? "Suspender" : "Activar")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

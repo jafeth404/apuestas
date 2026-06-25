@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Login Administrador";
+}
+
+<h2><i class="bi bi-shield-lock"></i> Inicio de Sesión - Administrador</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> ¿Primera vez?
+            <a asp-controller="AdminAuth" asp-action="SeedDefaultAdmin" class="alert-link">Crear administrador predeterminado</a>
+        </div>
+
+        <form asp-action="LoginAdmin" method="post">
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <p class="mb-0">@error.ErrorMessage</p>
+                    }
+                </div>
+            }
+
+            <div class="mb-3">
+                <label class="form-label">Usuario</label>
+                <input name="usuario" class="form-control" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input name="contrasena" type="password" class="form-control" required />
+            </div>
+
+            <button type="submit" class="btn btn-dark">
+                <i class="bi bi-box-arrow-in-right"></i> Ingresar como Admin
+            </button>
+
+            <a asp-action="Index" asp-controller="Home" class="btn btn-link">Volver al inicio</a>
+        </form>
+    </div>
+</div>

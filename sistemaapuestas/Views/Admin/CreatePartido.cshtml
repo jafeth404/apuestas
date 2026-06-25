@@ -1,0 +1,52 @@
+@model GestionPartidoViewModel
+
+@{
+    ViewData["Title"] = "Crear Partido";
+}
+
+<h2><i class="bi bi-plus-circle"></i> Crear Nuevo Partido</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CreatePartido" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="EquipoLocal" class="form-label"></label>
+                <input asp-for="EquipoLocal" class="form-control" />
+                <span asp-validation-for="EquipoLocal" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="EquipoVisitante" class="form-label"></label>
+                <input asp-for="EquipoVisitante" class="form-control" />
+                <span asp-validation-for="EquipoVisitante" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FechaHora" class="form-label"></label>
+                <input asp-for="FechaHora" class="form-control" type="datetime-local" />
+                <span asp-validation-for="FechaHora" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Fase" class="form-label"></label>
+                <select asp-for="Fase" class="form-select" asp-items="ViewBag.Fases">
+                    <option value="">-- Seleccione --</option>
+                </select>
+                <span asp-validation-for="Fase" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Crear Partido
+            </button>
+
+            <a asp-action="Index" class="btn btn-link">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

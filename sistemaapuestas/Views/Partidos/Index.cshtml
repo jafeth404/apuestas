@@ -1,0 +1,66 @@
+@model List<PartidoListViewModel>
+@using sistemaapuestas.Helpers
+
+@{
+    ViewData["Title"] = "Calendario de Partidos";
+}
+
+<h2><i class="bi bi-calendar-event"></i> Calendario del Mundial 2026</h2>
+<hr />
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay partidos disponibles en este momento.</div>
+}
+
+@foreach (var grupo in Model)
+{
+    <h4 class="text-primary mt-4">@grupo.Fase</h4>
+    <div class="row">
+        @foreach (var partido in grupo.Partidos)
+        {
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-center flex-grow-1">
+                                <h5 class="mb-0"><img src="@TeamFlagHelper.GetFlagUrl(partido.EquipoLocal)" class="me-1" style="vertical-align:middle"> @partido.EquipoLocal</h5>
+                                @if (partido.Estado == "finalizado")
+                                {
+                                    <span class="badge bg-dark fs-5 mt-1">@partido.GolesLocal - @partido.GolesVisitante</span>
+                                }
+                            </div>
+
+                            <div class="text-center mx-3">
+                                <span class="badge bg-info text-dark">VS</span>
+                            </div>
+
+                            <div class="text-center flex-grow-1">
+                                <h5 class="mb-0"><img src="@TeamFlagHelper.GetFlagUrl(partido.EquipoVisitante)" class="me-1" style="vertical-align:middle"> @partido.EquipoVisitante</h5>
+                                @if (partido.Estado == "finalizado")
+                                {
+                                    <span class="badge bg-dark fs-5 mt-1">@partido.GolesLocal - @partido.GolesVisitante</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-3">
+                            <small class="text-muted">
+                                <i class="bi bi-clock"></i> @partido.FechaHora.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                            </small>
+                            <span class="badge @(partido.Estado switch { "programado" => "bg-primary", "en_vivo" => "bg-success", _ => "bg-secondary" })">
+                                @partido.Estado
+                            </span>
+                        </div>
+
+                        <div class="mt-2">
+                            <a asp-action="Details" asp-route-id="@partido.Id" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="bi bi-info-circle"></i> Ver Detalles y Cuotas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

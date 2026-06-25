@@ -1,0 +1,70 @@
+@model CrearApuestaViewModel
+@using sistemaapuestas.Helpers
+
+@{
+    ViewData["Title"] = "Realizar Apuesta";
+}
+
+<h2><i class="bi bi-cash"></i> Realizar Apuesta</h2>
+<hr />
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+        <h4><img src="@TeamFlagHelper.GetFlagUrl(Model.EquipoLocal)" class="me-1" style="vertical-align:middle"> @Model.EquipoLocal <span class="mx-2">vs</span> <img src="@TeamFlagHelper.GetFlagUrl(Model.EquipoVisitante)" class="me-1" style="vertical-align:middle"> @Model.EquipoVisitante</h4>
+        <p class="text-muted">Cuota: <strong>@Model.Cuota.ToString("F2")</strong></p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <input type="hidden" asp-for="PartidoId" />
+            <input type="hidden" asp-for="Cuota" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label class="form-label">Tipo de Apuesta</label>
+                <select asp-for="TipoApuesta" class="form-select">
+                    <option value="">-- Seleccione --</option>
+                    <option value="local">Gana @Model.EquipoLocal</option>
+                    <option value="empate">Empate</option>
+                    <option value="visitante">Gana @Model.EquipoVisitante</option>
+                </select>
+                <span asp-validation-for="TipoApuesta" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Monto" class="form-label">Monto a Apostar</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input asp-for="Monto" class="form-control" id="montoInput" />
+                </div>
+                <span asp-validation-for="Monto" class="text-danger"></span>
+            </div>
+
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">Ganancia Potencial</h6>
+                    <h4 class="text-success" id="gananciaDisplay">$0.00</h4>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">
+                <i class="bi bi-check-circle"></i> Confirmar Apuesta
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('montoInput').addEventListener('input', function () {
+            var monto = parseFloat(this.value) || 0;
+            var cuota = @Model.Cuota;
+            var ganancia = monto * cuota;
+            document.getElementById('gananciaDisplay').textContent = '$' + ganancia.toFixed(2);
+        });
+    </script>
+}

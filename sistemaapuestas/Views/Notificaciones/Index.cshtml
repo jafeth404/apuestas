@@ -1,0 +1,45 @@
+@model NotificacionViewModel
+
+@{
+    ViewData["Title"] = "Notificaciones";
+}
+
+<h2>
+    <i class="bi bi-bell"></i> Notificaciones
+    @if (Model.NoLeidas > 0)
+    {
+        <span class="badge bg-danger">@Model.NoLeidas</span>
+    }
+</h2>
+<hr />
+
+@if (!Model.Notificaciones.Any())
+{
+    <div class="alert alert-info">No tienes notificaciones.</div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var notif in Model.Notificaciones)
+        {
+            <div class="list-group-item list-group-item-action @(notif.Leida ? "" : "fw-bold border-primary")">
+                <div class="d-flex w-100 justify-content-between">
+                    <p class="mb-1">@notif.Mensaje</p>
+                    <small class="text-muted">@notif.FechaCreacion.ToLocalTime().ToString("dd/MM/yy HH:mm")</small>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="badge bg-info">@notif.Tipo</span>
+                    @if (!notif.Leida)
+                    {
+                        <form asp-action="MarcarLeida" method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@notif.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-check2"></i> Marcar como leída
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,57 @@
+@model GestionPartidoViewModel
+@using sistemaapuestas.Helpers
+
+@{
+    ViewData["Title"] = "Registrar Resultado";
+}
+
+<h2><i class="bi bi-flag"></i> Registrar Resultado</h2>
+<hr />
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body text-center">
+        <h4><img src="@TeamFlagHelper.GetFlagUrl(Model.EquipoLocal)" class="me-1" style="vertical-align:middle"> @Model.EquipoLocal vs <img src="@TeamFlagHelper.GetFlagUrl(Model.EquipoVisitante)" class="me-1" style="vertical-align:middle"> @Model.EquipoVisitante</h4>
+        <p class="text-muted">@Model.FechaHora.ToLocalTime().ToString("dd/MM/yyyy HH:mm") | @Model.Fase</p>
+    </div>
+</div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="RegistrarResultado" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row mb-3">
+                <div class="col-5">
+                    <label asp-for="GolesLocal" class="form-label">@Model.EquipoLocal</label>
+                    <input asp-for="GolesLocal" class="form-control text-center" type="number" min="0" />
+                    <span asp-validation-for="GolesLocal" class="text-danger"></span>
+                </div>
+                <div class="col-2 d-flex align-items-end justify-content-center">
+                    <h4 class="text-muted">VS</h4>
+                </div>
+                <div class="col-5">
+                    <label asp-for="GolesVisitante" class="form-label">@Model.EquipoVisitante</label>
+                    <input asp-for="GolesVisitante" class="form-control text-center" type="number" min="0" />
+                    <span asp-validation-for="GolesVisitante" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> Al registrar el resultado, todas las apuestas pendientes se liquidarán automáticamente.
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Registrar Resultado y Liquidar Apuestas
+            </button>
+
+            <a asp-action="Index" class="btn btn-link">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

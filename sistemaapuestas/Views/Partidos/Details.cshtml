@@ -1,0 +1,78 @@
+@model PartidoDetalleViewModel
+@using sistemaapuestas.Helpers
+
+@{
+    ViewData["Title"] = $"{Model.Partido.EquipoLocal} vs {Model.Partido.EquipoVisitante}";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Partidos" asp-action="Index">Partidos</a></li>
+        <li class="breadcrumb-item active">@Model.Partido.EquipoLocal vs @Model.Partido.EquipoVisitante</li>
+    </ol>
+</nav>
+
+<div class="card shadow mb-4">
+    <div class="card-body text-center">
+        <div class="row align-items-center">
+            <div class="col-5">
+                <h3><img src="@TeamFlagHelper.GetFlagUrl(Model.Partido.EquipoLocal)" class="me-2" style="vertical-align:middle"> @Model.Partido.EquipoLocal</h3>
+                @if (Model.Partido.Estado == "finalizado")
+                {
+                    <h1 class="display-4 fw-bold">@Model.Partido.GolesLocal</h1>
+                }
+            </div>
+            <div class="col-2">
+                <h2 class="text-muted">VS</h2>
+                <span class="badge @(Model.Partido.Estado switch { "programado" => "bg-primary", "en_vivo" => "bg-success", _ => "bg-secondary" })">
+                    @Model.Partido.Estado
+                </span>
+            </div>
+            <div class="col-5">
+                <h3><img src="@TeamFlagHelper.GetFlagUrl(Model.Partido.EquipoVisitante)" class="me-2" style="vertical-align:middle"> @Model.Partido.EquipoVisitante</h3>
+                @if (Model.Partido.Estado == "finalizado")
+                {
+                    <h1 class="display-4 fw-bold">@Model.Partido.GolesVisitante</h1>
+                }
+            </div>
+        </div>
+
+        <p class="text-muted mt-3">
+            <i class="bi bi-calendar"></i> @Model.Partido.FechaHora.ToLocalTime().ToString("dd/MM/yyyy HH:mm") |
+            <i class="bi bi-tag"></i> @Model.Partido.Fase
+        </p>
+    </div>
+</div>
+
+@if (Model.Cuotas.Any())
+{
+    <h4><i class="bi bi-graph-up"></i> Cuotas Disponibles</h4>
+    <div class="row mb-4">
+        @foreach (var cuota in Model.Cuotas)
+        {
+            <div class="col-md-4 mb-2">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title">@cuota.Tipo</h6>
+                        <h3 class="text-primary">@cuota.Valor.ToString("F2")</h3>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (Model.PuedeApostar)
+{
+    <a asp-controller="Apuestas" asp-action="Create" asp-route-partidoId="@Model.Partido.Id"
+       class="btn btn-success btn-lg w-100">
+        <i class="bi bi-cash"></i> Apostar en este Partido
+    </a>
+}
+else if (Context.Session.GetInt32("UserId") == null)
+{
+    <div class="alert alert-info">
+        <a asp-controller="Auth" asp-action="Login">Inicia sesión</a> o
+        <a asp-controller="Auth" asp-action="Registro">regístrate</a> para apostar.
+    </div>
+}

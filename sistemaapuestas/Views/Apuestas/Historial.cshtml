@@ -1,0 +1,93 @@
+@model HistorialViewModel
+@using sistemaapuestas.Helpers
+
+@{
+    ViewData["Title"] = "Historial de Apuestas";
+}
+
+<h2><i class="bi bi-list-check"></i> Historial de Apuestas</h2>
+<hr />
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white text-center">
+            <div class="card-body">
+                <h6>Total Apostado</h6>
+                <h4>$@Model.TotalApostado.ToString("F2")</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white text-center">
+            <div class="card-body">
+                <h6>Total Ganado</h6>
+                <h4>$@Model.TotalGanado.ToString("F2")</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-light text-center">
+            <div class="card-body">
+                <h6>Filtrar por Estado</h6>
+                <div class="btn-group">
+                    <a asp-action="Historial" class="btn btn-sm @(Model.FiltroEstado == null ? "btn-dark" : "btn-outline-dark")">Todas</a>
+                    <a asp-action="Historial" asp-route-estado="pendiente" class="btn btn-sm @(Model.FiltroEstado == "pendiente" ? "btn-warning" : "btn-outline-warning")">Pendientes</a>
+                    <a asp-action="Historial" asp-route-estado="ganada" class="btn btn-sm @(Model.FiltroEstado == "ganada" ? "btn-success" : "btn-outline-success")">Ganadas</a>
+                    <a asp-action="Historial" asp-route-estado="perdida" class="btn btn-sm @(Model.FiltroEstado == "perdida" ? "btn-danger" : "btn-outline-danger")">Perdidas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!Model.Apuestas.Any())
+{
+    <div class="alert alert-info">No tienes apuestas registradas.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Partido</th>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                    <th>Cuota</th>
+                    <th>Ganancia</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var apuesta in Model.Apuestas)
+                {
+                    <tr>
+                        <td>@apuesta.FechaApuesta.ToLocalTime().ToString("dd/MM/yy HH:mm")</td>
+                        <td><img src="@TeamFlagHelper.GetFlagUrl(apuesta.Partido?.EquipoLocal)" class="me-1" style="vertical-align:middle"> @apuesta.Partido?.EquipoLocal vs <img src="@TeamFlagHelper.GetFlagUrl(apuesta.Partido?.EquipoVisitante)" class="me-1" style="vertical-align:middle"> @apuesta.Partido?.EquipoVisitante</td>
+                        <td>@apuesta.TipoApuesta</td>
+                        <td>$@apuesta.Monto.ToString("F2")</td>
+                        <td>@apuesta.CuotaAplicada.ToString("F2")</td>
+                        <td>
+                            @if (apuesta.Ganancia.HasValue)
+                            {
+                                <span class="@(apuesta.Ganancia > 0 ? "text-success" : "text-danger")">
+                                    $@apuesta.Ganancia.Value.ToString("F2")
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge @(apuesta.Estado switch { "pendiente" => "bg-warning text-dark", "ganada" => "bg-success", _ => "bg-danger" })">
+                                @apuesta.Estado
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
